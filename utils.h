@@ -13,7 +13,8 @@
 
 using namespace std;
 
-double ph33toProb(char phred);
+double probSubErr(const char& phred, const double& eps_S);
+double ph33toProb(const char& phred);
 bool compareRefPos(baseInfo snp1, baseInfo snp2);
 void readPosFile(const string& posInput, unordered_map <string, locusInfo>& posMap, vector <string>& locusNames);
 void readRefSeqs(const string& refInput, const vector <string>& locusNames, unordered_map <string, locusInfo>& posMap);

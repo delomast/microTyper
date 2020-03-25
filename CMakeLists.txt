@@ -33,19 +33,16 @@ add_library(libbamtools STATIC IMPORTED)
 set_target_properties(libbamtools PROPERTIES IMPORTED_LOCATION ${BAMTOOLS_LIBRARIES}/libbamtools.a)
 add_dependencies(libbamtools bamtools)
 
-
-# bamtools
+# likelihood calculations
 add_executable(mtype microTyper.cpp utils.cpp utils.h calculate_llh.cpp calculate_llh_with_logSumExp.cpp calculate_llh.h typedefs.h)
 
-#target_link_libraries(mtype bamtools)
 include_directories(${BAMTOOLS_INCLUDE_DIRS})
 target_link_libraries(mtype libbamtools ZLIB::ZLIB)
-
-
 # use openmp if found
 if(OpenMP_CXX_FOUND)
     target_link_libraries(mtype OpenMP::OpenMP_CXX)
 endif()
 
+# genotype caller
 add_executable(genoCaller llrGenotyper.cpp utils.cpp utils.h typedefs.h)
 

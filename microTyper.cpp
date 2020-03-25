@@ -92,6 +92,7 @@ int main(int argc, char* argv[]){
 		cerr << "Error: eps_I must be between 0 and 1 inclusive." << endl;
 		return 1;
 	}
+	if(eps_I == 0) cerr << "Warning: eps_I being equal to 0 is usually unrealistic and can cause problems." << endl;
 
 	// read in position input file
 	unordered_map <string, locusInfo> posMap;

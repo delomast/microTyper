@@ -13,13 +13,19 @@
 using namespace std;
 
 // calculate probability of wrong base from PHRED score
-double ph33toProb(char phred){
+double ph33toProb(const char& phred){
 	double Q = static_cast<int>(phred) - 33;
 	if(Q < 0){
 		cerr << "Error: Unexpected PHRED score. Is it +33 or +64? Only +33 is supported." << endl;
 		exit(EXIT_FAILURE);
 	}
 	return pow(10, (Q / -10));
+}
+
+// calculate probability of substitution error from eps_S and phred score
+double probSubErr(const char& phred, const double& eps_S){
+	double e2 = ph33toProb(phred);
+	return (eps_S * (1 - e2)) + ((2/3) * eps_S * e2) + ((1 - eps_S) * e2);
 }
 
 // comparison for baseInfo objects based on reference position
@@ -72,6 +78,11 @@ void readPosFile(const string& posInput,
 				unordered_map <string, locusInfo>& posMap,  // edited by this function instead of returned
 				vector <string>& locusNames){ // edited by this function instead of returned
 	ifstream posFile (posInput);
+	if(!posFile.is_open()){
+		cerr << "Error: variant file specified (-p) could not be opened." << endl;
+		exit(EXIT_FAILURE);
+	}
+
 	string line;
 	getline(posFile, line); // skip header
 	while (getline(posFile, line)){
@@ -178,6 +189,11 @@ void readRefSeqs(const string& refInput,
 				const vector <string>& locusNames,
 				unordered_map <string, locusInfo>& posMap){
 	ifstream refFile (refInput);
+	if(!refFile.is_open()){
+		cerr << "Error: reference file specified (-r) could not be opened." << endl;
+		exit(EXIT_FAILURE);
+	}
+
 	string line;
 	string curSeqName;
 	string curSeq;

@@ -46,6 +46,24 @@ void calculate_llh(const string bamInput,
 	regex testRegex;
 	bool regexBool;
 	while (reader.GetNextAlignment(al)) {
+
+		// check if paired and throw error if it is
+		if(al.IsPaired()){
+			cerr << "Error: paired read found in " << bamInput <<
+			  ". Only single end reads are currently supported." << endl;
+			exit(EXIT_FAILURE);
+		}
+
+		// check if aligned to reverse strand and throw error if it did
+		if(al.IsReverseStrand()){
+			cerr << "Error: read mapped to reverse strand found in " << bamInput <<
+			  ". Only alignments to the forward strand are currently supported." << endl;
+			exit(EXIT_FAILURE);
+		}
+
+		// skip if unmapped
+		if(!al.IsMapped()) continue;
+
 		// if different from last, get the appropriate info
 		if(rName != rL[al.RefID]){
 			if(skipLocus[al.RefID]) continue; // if refID is not in the position file, skip this alignment
@@ -55,6 +73,7 @@ void calculate_llh(const string bamInput,
 			regexBool = (*lInfo).regExBool;
 			if(regexBool) testRegex.assign((*lInfo).regEx);
 		}
+
 		// skip alignment if regex is present and it does not match
 		if(regexBool){
 			if(!regex_search(al.QueryBases, testRegex)) continue;
@@ -85,17 +104,17 @@ void calculate_llh(const string bamInput,
 									snpsTested++;
 									if (al.QueryBases[queCur + dist] == (*gT).gTable[i].A1.snpAlleles[j]){
 										// read matches the allele
-										A1_lh *= 1 - (eps_S + ph33toProb(al.Qualities[queCur + dist]));
+										A1_lh *= 1 - probSubErr(al.Qualities[queCur + dist], eps_S);
 									} else {
-										A1_lh *= (eps_S + ph33toProb(al.Qualities[queCur + dist])) / 3;
+										A1_lh *= probSubErr(al.Qualities[queCur + dist], eps_S) / 3;
 										A1_p = false;
 									}
 									if ((*gT).gTable[i].hom) break;
 									if (al.QueryBases[queCur + dist] == (*gT).gTable[i].A2.snpAlleles[j]){
 										// read matches the allele
-										A2_lh *= 1 - (eps_S + ph33toProb(al.Qualities[queCur + dist]));
+										A2_lh *= 1 - probSubErr(al.Qualities[queCur + dist], eps_S);
 									} else {
-										A2_lh *= (eps_S + ph33toProb(al.Qualities[queCur + dist])) / 3;
+										A2_lh *= probSubErr(al.Qualities[queCur + dist], eps_S) / 3;
 										A2_p = false;
 									}
 									break;
