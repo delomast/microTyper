@@ -87,6 +87,8 @@ int main(int argc, char* argv[]){
 			minPerfect = atof(argv[++i]);
 		} else if (x == "-p") {
 			priorFile = string(argv[++i]);
+		} else if (x == "--version") {
+			 printVersion();
 		} else {
 			cerr << "Error: Option " << x << " not recognized." << endl;
 			exit(EXIT_FAILURE);

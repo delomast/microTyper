@@ -61,6 +61,8 @@ int main(int argc, char* argv[]){
 			 numThreads = stoi(argv[++i]);
 		} else if (x == "--manySNPs") {
 			 call_with_lse = true;
+		} else if (x == "--version") {
+			 printVersion();
 		} else {
 			cerr << "Error: Option " << x << " not recognized." << endl;
 			return 1;

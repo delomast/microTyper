@@ -1,0 +1,8 @@
+Locus	RefPos	Type	ValidAlt	Regex
+Omy_ndk-152	53	S	A	
+Omy_ndk-152	68	S	G	
+Omy_cd59b-112	16	S	T	
+Omy_cd59b-112	37	I	I	
+Omy_cd59b-112	52	S	T	
+OMS00129	46	S	G,A	
+OMS00129	65	S	C	

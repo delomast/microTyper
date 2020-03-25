@@ -13,6 +13,7 @@
 
 using namespace std;
 
+void printVersion();
 double probSubErr(const char& phred, const double& eps_S);
 double ph33toProb(const char& phred);
 bool compareRefPos(baseInfo snp1, baseInfo snp2);

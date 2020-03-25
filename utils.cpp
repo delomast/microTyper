@@ -12,6 +12,12 @@
 
 using namespace std;
 
+// print version number
+void printVersion(){
+	cout << "Version 1.0" << endl;
+	exit(EXIT_SUCCESS);
+}
+
 // calculate probability of wrong base from PHRED score
 double ph33toProb(const char& phred){
 	double Q = static_cast<int>(phred) - 33;
@@ -259,7 +265,7 @@ void readRefSeqs(const string& refInput,
 // build vectors of all possibly alleles for each locus
 void buildAlleles(const unordered_map <string, locusInfo>& posMap, const vector <string>& locusNames,
 			unordered_map <string, alleleTable>& locusAlleleTables){
-	for(int i = 0, max = locusNames.size(); i < max; i++){
+	for(int i = 0, max = locusNames.size(); i < max; i++){ // for each locus
 		alleleTable tempAT;
 		tempAT.name = locusNames[i];
 
@@ -267,7 +273,26 @@ void buildAlleles(const unordered_map <string, locusInfo>& posMap, const vector 
 		const locusInfo * tempLI;
 		tempLI = &posMap.at(locusNames[i]);
 		vector <vector <char> > tempVec;
-		for(int j = 0, max2 = (*tempLI).snps.size(); j < max2; j++){
+		for(int j = 0, max2 = (*tempLI).snps.size(); j < max2; j++){ // for each SNP in the locus
+
+			// first check that all reference and alt alleles are different
+			vector <char> allSNPalleles;
+			allSNPalleles = (*tempLI).snps[j].validAlt;
+			allSNPalleles.push_back((*tempLI).snps[j].refValue);
+			for(int k = 0, m = allSNPalleles.size(); k < m - 1; k++){
+				for(int l = k + 1; l < m; l++){
+					if(allSNPalleles[k] == allSNPalleles[l]){
+						cerr << "Error: two SNP alleles with the same symbol in locus " << locusNames[i] << endl;
+						cerr << "The position of the SNP is " << (*tempLI).snps[j].refPos << endl;
+						cerr << "The reference allele is " << (*tempLI).snps[j].refValue << endl;
+						cerr << "The alternative alleles are : ";
+						for(int n = 0, nmax = (*tempLI).snps[j].validAlt.size(); n < nmax; n++) cerr << (*tempLI).snps[j].validAlt[n] << " ";
+						cerr << endl;
+						exit(EXIT_FAILURE);
+					}
+				}
+			}
+
 			if(j == 0){ // start vector of alleles
 				vector <char> temp2(1);
 				temp2[0] = (*tempLI).snps[j].refValue;
