@@ -22,7 +22,7 @@ Now, navigate to the example folder
   cd example/  
 ```
   
-Here, there are three samples, a position file, and a refernce file.
+Here, there are three samples, a position file, and a reference file.
 We then calculate log-likelihoods for each genotype and sample  
 ```
   ../mtype -f *.bam -p examplePositionFile.txt -r exampleReference.fasta  
