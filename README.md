@@ -152,6 +152,6 @@ The entries for Allele1 and Allelle2 must match exactly the entries present in t
 
 ### Output file formats
 
-describe mhgenos file here
+The output of the first step is a file conatining the log-likelihood of each genotype for each locus in each individual. It also has two columns containing the counts of reads that are "perfect matches" for each allele of each genotype. The "A1_perfect_count" column has the number of reads that match Allele1 at all SNPs in the locus. If the genotype is a homozygous genotype, the "A2_perfect_count" column is 0. Otherwise, the "A2_perfect_count" column has the number of reads that match Allele2 at all SNPs in the locus. This file is mainly used as the input for second step, but is output for users who may want to use the likelihoods or perfect match read counts directly. If a user wants to examine the number of reads that are perfect matches for each allele, this can be extracted by using the values in "A1_perfect_count" for all homozygous genotypes.
 
-describe genotype file output here
+The output of the second step contains one line for each individual and each locus. If the most probable genotype for a locus in a given individual passes the filters (-c and -m), it is included in the output in the "Allele1" and "Allele2" columns. If it does not pass the filters, those two columns are blank. Regardless of whether it passed the filters or not, the posterior probability of the most probable genotype is in the "Pr_geno" column. The "A1_perfect" column has the number of reads that match Allele1 at all SNPs in the locus. If the genotype is a homozygous genotype, the "A2_perfect" column is 0. Otherwise, the "A2_perfect" column has the number of reads that match Allele2 at all SNPs in the locus.
