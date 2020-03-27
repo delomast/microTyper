@@ -3,7 +3,8 @@ genotyping microhaplotypes
 
 Mainly focused on genotyping using reads from amplicon sequencing.  
   
-Reads bam files using the bamtools API, which is bundled with the  
+Reads bam files using the bamtools API (Barnett et al. 2011, 
+https://doi.org/10.1093/bioinformatics/btr174), which is bundled with the 
 microTyper code for ease of install.
   
   
@@ -56,6 +57,7 @@ the second calls genotypes based on posterior probability and an optional depth 
   mtype -f sample.bam -p positionFile.txt -r reference.fasta  
 ```
 Required arguments  
+
 - `-f` space separated list of input bam files. For example:
   - `-f sample1.bam`
   - `-f sample1.bam sample2.bam`
@@ -66,6 +68,7 @@ Required arguments
   sequence is assumed to be one locus (one microhaplotype).
 
 Optional arguments
+
 - `-o` the name to give the output file (default: microtyper_llh.mhgenos)
 - `-eps_S` the probability of an incorrect base being present in a read prior to sequencing 
   error (error due to PCR error during amplification, index hopping, etc.) (default: 0.01)
@@ -87,10 +90,12 @@ Optional arguments
 ```
 
 Required arguments
+
 - `-f` the file containing log-likelihoods that was output during step 1. The order of the lines
   in this file is important, so do not reorder any lines after running step 1.
 
 Optional arguments
+
 - `-o` the name to give the output file (default: mh_genotypes.txt) 
 - `-p` a file specifying the priors to use, see below for format. (default: uniform priors)
 - `-c` the minimum posterior probability the most probable genotype must have (for a given individual 
@@ -145,13 +150,31 @@ The columns are, in order,
 - Allele2: the second allele in this genotype
 - Prior: The prior probability
 
-After being read, the priors are normalized within each locus, and so these may be relative probabilities. Priors must not be zero, but can be very small. Priors can be expressed using exponential notation (i.e. 1e-20).
+After being read, the priors are normalized within each locus, and so these may be relative probabilities. 
+Priors must not be zero, but can be very small. Priors can be expressed using exponential notation (i.e. 1e-20).
 
-The entries for Allele1 and Allelle2 must match exactly the entries present in the output file created by step 1 (with the log-likelihoods for each genotype). **The easiest way to make this file is to run the first step with one input bam file, then delete the "Indiv", "A1_perfect_count", and "A2_perfect_count" columns, and then replace the LLH values with your prior values.**  There is an example prior input file in the "examples" directory.
+The entries for Allele1 and Allelle2 must match exactly the entries present in the output file created by step 
+1 (with the log-likelihoods for each genotype). **The easiest way to make this file is to run the first step 
+with one input bam file, then delete the "Indiv", "A1_perfect_count", and "A2_perfect_count" columns, and then 
+replace the LLH values with your prior values.**  There is an example prior input file in the "examples" directory.
 
 
 ### Output file formats
 
-The output of the first step is a file containing the log-likelihood of each genotype for each locus in each individual. It also has two columns containing the counts of reads that are "perfect matches" for each allele of each genotype. The "A1_perfect_count" column has the number of reads that match Allele1 at all SNPs in the locus. If the genotype is a homozygous genotype, the "A2_perfect_count" column is 0. Otherwise, the "A2_perfect_count" column has the number of reads that match Allele2 at all SNPs in the locus. This file is mainly used as the input for the second step, but is output for users who may want to use the likelihoods or perfect match read counts directly. If a user wants to examine the number of reads that are perfect matches for each allele, this can be extracted by using the values in "A1_perfect_count" for all homozygous genotypes.
+The output of the first step is a file containing the log-likelihood of each genotype for each locus in each 
+individual. It also has two columns containing the counts of reads that are "perfect matches" for each allele 
+of each genotype. The "A1_perfect_count" column has the number of reads that match Allele1 at all SNPs in the 
+locus. If the genotype is a homozygous genotype, the "A2_perfect_count" column is 0. Otherwise, the 
+"A2_perfect_count" column has the number of reads that match Allele2 at all SNPs in the locus. This 
+file is mainly used as the input for the second step, but is output for users who may want to use the 
+likelihoods or perfect match read counts directly. If a user wants to examine the number of reads 
+that are perfect matches for each allele, this can be extracted by using the values in "A1_perfect_count" 
+for all homozygous genotypes.
 
-The output of the second step contains one line for each individual and each locus. If the most probable genotype for a locus in a given individual passes the filters (-c and -m), it is included in the output in the "Allele1" and "Allele2" columns. If it does not pass the filters, those two columns are blank. Regardless of whether it passed the filters or not, the posterior probability of the most probable genotype is in the "Pr_geno" column. The "A1_perfect" column has the number of reads that match Allele1 at all SNPs in the locus. If the genotype is a homozygous genotype, the "A2_perfect" column is 0. Otherwise, the "A2_perfect" column has the number of reads that match Allele2 at all SNPs in the locus.
+The output of the second step contains one line for each individual and each locus. If the most probable 
+genotype for a locus in a given individual passes the filters (-c and -m), it is included in the output 
+in the "Allele1" and "Allele2" columns. If it does not pass the filters, those two columns are blank. 
+Regardless of whether it passed the filters or not, the posterior probability of the most probable genotype 
+is in the "Pr_geno" column. The "A1_perfect" column has the number of reads that match Allele1 at all SNPs 
+in the locus. If the genotype is a homozygous genotype, the "A2_perfect" column is 0. Otherwise, the 
+"A2_perfect" column has the number of reads that match Allele2 at all SNPs in the locus.
