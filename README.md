@@ -7,7 +7,7 @@ Reads bam files using the bamtools API, which is bundled with the
 microTyper code for ease of install.
   
   
-Installation and example
+## Installation and example
 
 First, we unpack and compile  
 ```
@@ -34,7 +34,7 @@ minimum number of reads that perfectly match one of the alleles in the genotype 
   ../genoCaller -f microtyper_llh.mhgenos -c .99 -m 10
 ```
   
-Manual
+## Manual
 
 microTyper is intended to genotype individual samples for microhaplotypes using 
 aligned reads from amplicon sequencing. The goal is to provide a straightforward 
@@ -50,7 +50,7 @@ compile and function, but will be limited to one thread.
 microTyper has two steps, the first calculates log-likelihoods of each genotype and 
 the second calls genotypes based on posterior probability and an optional depth filter.
 
-The first step (calculating log-likelihoods):
+### The first step (calculating log-likelihoods):
 
 ```
   mtype -f sample.bam -p positionFile.txt -r reference.fasta  
@@ -80,7 +80,7 @@ Optional arguments
   calculate the log-likelihoods, but will be slower than otherwise. 
 - `--version` print the version of microTyper being used and exit 
 
-The second step (calculating posterior probabilities and calling genotypes):  
+### The second step (calculating posterior probabilities and calling genotypes):  
 
 ```
   genoCaller -f microtyper_llh.mhgenos
@@ -88,7 +88,7 @@ The second step (calculating posterior probabilities and calling genotypes):
 
 Required arguments
 - `-f` the file containing log-likelihoods that was output during step 1. The order of the lines
-  in this file is important, so do not reorder the line after running step 1.
+  in this file is important, so do not reorder any lines after running step 1.
 
 Optional arguments
 - `-o` the name to give the output file (default: mh_genotypes.txt) 
@@ -100,14 +100,18 @@ Optional arguments
 - `--version` print the version of microTyper being used and exit 
 
 
-The position file
+### The position file
 
 The position file gives information about the SNPs within each locus. It is a tab-delimited file with
 a REQUIRED header row (actual text in header row is not important). Each line defines a SNP. 
 The columns are, in order,  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Locus&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RefPos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidAlt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Regex  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Locus
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RefPos
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidAlt
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Regex  
  
-- Locus: the name of the reference sequence for the locus conita
+- Locus: the name of the reference sequence for the locus containing this SNP
 - RefPos: the position of the SNP in the reference sequence
 - Type: the type of SNP, relative to the reference. One of 
   "S", "I", or "D" for substitution, insertion, or deletion, respectively
@@ -122,16 +126,31 @@ The columns are, in order,
 - Regex: this column is optional. If included, only one entry per locus should have a value. The value
   is used as a regular expression and any read that maps to this locus that do NOT match this regular 
   expression are ignored. An example of use would be, if you only want to consider reads that start 
-  with an exact match to the forward primer, you could put "^ACTGACTGACTG" where ACTGACTGACTG is the 
+  with an exact match to the forward primer, you could put `^ACTGACTGACTG` where ACTGACTGACTG is the 
   forward primer.
 
 
-The prior file
+### The prior file
 
-describe prior file here
+The prior gives the prior probability for each genotype of each locus. It is a tab-delimited file with
+a REQUIRED header row (actual text in header row is not important). Each line describes a genotype. 
+The columns are, in order,  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Locus
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allele1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allele2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prior  
+
+- Locus: the name of the reference sequence for the locus
+- Allele1: the first allele in this genotype
+- Allele2: the second allele in this genotype
+- Prior: The prior probability
+
+After being read, the priors are normalized within each locus, and so these may be relative probabilities. Priors must not be zero, but can be very small. Priors can be expressed using exponential notation (i.e. 1e-20).
+
+The entries for Allele1 and Allelle2 must match exactly the entries present in the output file created by step 1 (with the log-likelihoods for each genotype). **The easiest way to make this file is to run the first step with one input bam file, then delete the "Indiv", "A1_perfect_count", and "A2_perfect_count" columns, and then replace the LLH values with your prior values.**  There is an example prior input file in the "examples" directory.
 
 
-Output file formats
+### Output file formats
 
 describe mhgenos file here
 
