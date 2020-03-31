@@ -1,7 +1,5 @@
 /*
  simple genotyper for output of microTyper
- g++ llrGenotyper.cpp -c -I /usr/local/include/bamtools -L /usr/local/lib -lbamtools -lz -o llrGenotyper.o
- g++ llrGenotyper.o utils.o -o genoCaller
 */
 
 #include <iostream>
@@ -72,6 +70,9 @@ int main(int argc, char* argv[]){
 	string priorFile; // -p
 	double c = log(.95); // -c probability threshold to accept a genotype: currently assumes a constant prior on genotypes
 	double minPerfect = 0; // -m minimum number of perfect reads for the alleles in that genotype
+
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
 
 	// get input options and check
 	std::string x;
@@ -162,11 +163,21 @@ int main(int argc, char* argv[]){
 		}
 	}
 
-	ifstream llhFile (mhgenosInput);
-	if(!llhFile.is_open()){
-		cerr << "Error: Log-likelihood file specified (-f) could not be opened." << endl;
-		exit(EXIT_FAILURE);
+	bool use_stdin = false;
+	if(mhgenosInput == "-") use_stdin = true;
+	istream * llhIn;
+	ifstream llhFile;
+	if(!use_stdin){
+		llhFile.open(mhgenosInput);
+		if(!llhFile.is_open()){
+			cerr << "Error: Log-likelihood file specified (-f) could not be opened." << endl;
+			exit(EXIT_FAILURE);
+		}
+		llhIn = &llhFile;
+	} else {
+		llhIn = &cin;
 	}
+
 
 	string line;
 	ofstream genoOutFile (outputName, ofstream::trunc);
@@ -174,10 +185,12 @@ int main(int argc, char* argv[]){
 	string curInd ("");
 	string curLoc ("");
 	genoTable gT;
-	getline(llhFile, line); // skip header
+	getline((*llhIn), line); // skip header
 	// have to "bookend" and treat first and last outside of loop
 	vector <string> split;
-	getline(llhFile, line); // first entry
+	// first entry
+	getline((*llhIn), line);
+
 	splitString(line, '\t', split);
 	gT.indName = split[0];
 	gT.locName = split[1];
@@ -185,7 +198,7 @@ int main(int argc, char* argv[]){
 	addGenotype(split, gT, priorUse, priorMap);
 	split.clear();
 
-	while (getline(llhFile, line)){
+	while (getline((*llhIn), line)){
 		splitString(line, '\t', split);
 		// if same, add to list
 		if(split[0] == gT.indName && split[1] == gT.locName){
@@ -205,7 +218,7 @@ int main(int argc, char* argv[]){
 	// call last genotype
 	callGenotype(gT, genoOutFile, c, minPerfect);
 
-	llhFile.close();
+	if (llhFile.is_open()) llhFile.close();
 	genoOutFile.close();
 
 }

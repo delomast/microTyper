@@ -34,6 +34,15 @@ minimum number of reads that perfectly match one of the alleles in the genotype 
 ```
   ../genoCaller -f microtyper_llh.mhgenos -c .99 -m 10
 ```
+
+If we don't want to save the intermediate output file with log-likelihoods, 
+we can pipe the output from one to the other (`-o -` specifies writing output to stdout, and 
+`-f -` specifies reading from stdin):
+```
+../mtype -f *.bam -p examplePositionFile.txt -r exampleReference.fasta -o - | 
+  ../genoCaller -f - -c .99 -m 10
+```
+
   
 ## Manual
 
@@ -69,7 +78,8 @@ Required arguments
 
 Optional arguments
 
-- `-o` the name to give the output file (default: microtyper_llh.mhgenos)
+- `-o` the name to give the output file (default: microtyper_llh.mhgenos).
+  - To write output to stdout, use `-o -`
 - `-eps_S` the probability of an incorrect base being present in a read prior to sequencing 
   error (error due to PCR error during amplification, index hopping, etc.) (default: 0.01)
 - `-eps_I` the probability of an indel error in a read (default: 0.01)
@@ -92,7 +102,8 @@ Optional arguments
 Required arguments
 
 - `-f` the file containing log-likelihoods that was output during step 1. The order of the lines
-  in this file is important, so do not reorder any lines after running step 1.
+  in this file is important, so do not reorder any lines after running step 1. To read from stdin, 
+  use `-f -`
 
 Optional arguments
 

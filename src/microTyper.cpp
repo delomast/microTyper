@@ -2,8 +2,6 @@
  microTyper
  TA Delomas Spring 2020
 */
-// g++ microhap_dev.cpp -I /usr/local/include/bamtools -L /usr/local/lib -lbamtools -lz
-// g++ microTyper_codeBlocks.cpp -I /usr/local/include/bamtools -L /usr/local/lib -lbamtools -lz -fopenmp -o mtype
 
 #include <iostream>
 #include <fstream>
@@ -31,6 +29,8 @@ int main(int argc, char* argv[]){
 	int batchSize = 100; // number of individuals to process and write at once -b
 	unsigned int numThreads = 1; // number of threads to use -t
 	bool call_with_lse = false; // to use log-sum-exp --manySNPs
+
+	ios_base::sync_with_stdio(false);
 
 	// get input options and check
 	std::string x;
@@ -68,6 +68,10 @@ int main(int argc, char* argv[]){
 			return 1;
 		}
 	}
+
+	// optionally output results to std_out
+	bool use_stdout = false;
+	if (outputName == "-") use_stdout = true;
 
 	// input error checking
 	if (bamInput.size() == 0) {
@@ -141,11 +145,21 @@ int main(int argc, char* argv[]){
 	}
 
 	// opening output file and writing header line
-	ofstream llhOut (outputName, ofstream::trunc);
-	llhOut << "Indiv" << "\t" << "Locus" << "\t" << "Allele1" <<
+	ofstream llhOut;
+	if(use_stdout) {
+		cout << "Indiv" << "\t" << "Locus" << "\t" << "Allele1" <<
 				"\t" << "Allele2" << "\t" << "LLH" << "\t" <<
 				"A1_perfect_count" << "\t" << "A2_perfect_count" << "\n";
-
+	} else {
+		llhOut.open(outputName, ofstream::trunc);
+		if(!llhOut.is_open()){
+			cerr << "Could not open " << outputName << "to write output." << endl;
+			exit(EXIT_FAILURE);
+		}
+		llhOut << "Indiv" << "\t" << "Locus" << "\t" << "Allele1" <<
+				"\t" << "Allele2" << "\t" << "LLH" << "\t" <<
+				"A1_perfect_count" << "\t" << "A2_perfect_count" << "\n";
+	}
 	// for each individual
 	int indivPos = 0;
 	int nIndiv = bamInput.size();
@@ -176,9 +190,16 @@ int main(int argc, char* argv[]){
 				for(int j = 0, max2 = (*tGT).gTable.size(); j < max2; j++){
 					// tab delimited
 					// columns are Indiv	Locus	Allele1	Allele2	LLH	A1_perfect	A2_perfect
-					llhOut << (*tGT).indName << "\t" << (*tGT).locName << "\t" << (*tGT).gTable[j].A1.name <<
-						"\t" << (*tGT).gTable[j].A2.name << "\t" << (*tGT).gTable[j].llh << "\t" <<
-						(*tGT).gTable[j].A1_perfect << "\t" << (*tGT).gTable[j].A2_perfect << "\n";
+					if(use_stdout){
+						cout << (*tGT).indName << "\t" << (*tGT).locName << "\t" << (*tGT).gTable[j].A1.name <<
+							"\t" << (*tGT).gTable[j].A2.name << "\t" << (*tGT).gTable[j].llh << "\t" <<
+							(*tGT).gTable[j].A1_perfect << "\t" << (*tGT).gTable[j].A2_perfect << "\n";
+					} else {
+						llhOut << (*tGT).indName << "\t" << (*tGT).locName << "\t" << (*tGT).gTable[j].A1.name <<
+							"\t" << (*tGT).gTable[j].A2.name << "\t" << (*tGT).gTable[j].llh << "\t" <<
+							(*tGT).gTable[j].A1_perfect << "\t" << (*tGT).gTable[j].A2_perfect << "\n";
+					}
+
 				}
 			}
 		}
@@ -186,23 +207,11 @@ int main(int argc, char* argv[]){
 		indivPos += curBatchSize;
 	}
 
-
-
 	// closing output file
-	llhOut.close();
+	if(llhOut.is_open()) llhOut.close();
 
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
