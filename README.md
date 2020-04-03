@@ -125,7 +125,6 @@ The columns are, in order,
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RefPos
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidAlt
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Regex  
  
 - Locus: the name of the reference sequence for the locus containing this SNP
 - RefPos: the position of the SNP in the reference sequence
@@ -139,11 +138,6 @@ The columns are, in order,
     reference allele is automatically designated as "D".
   - for deletion SNPs, a character (not "I") to use in the output when a deletion is found. The 
     reference allele is automatically designated as "I".
-- Regex: this column is optional. If included, only one entry per locus should have a value. The value
-  is used as a regular expression and any read that maps to this locus that do NOT match this regular 
-  expression are ignored. An example of use would be, if you only want to consider reads that start 
-  with an exact match to the forward primer, you could put `^ACTGACTGACTG` where ACTGACTGACTG is the 
-  forward primer.
 
 
 ### The prior file
