@@ -18,8 +18,6 @@ struct baseInfo {
 struct locusInfo{
 	string name;
 	string refSequence;
-	string regEx;
-	bool regExBool;
 	vector <baseInfo> snps;
 };
 

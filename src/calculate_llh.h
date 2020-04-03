@@ -2,7 +2,6 @@
 #define CALCULATE_LLH
 
 #include <string>
-#include <regex>
 #include <vector>
 #include <unordered_map>
 #include <math.h>

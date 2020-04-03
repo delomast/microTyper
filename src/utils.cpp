@@ -94,15 +94,12 @@ void readPosFile(const string& posInput,
 	while (getline(posFile, line)){
 		if(line.substr(0,1) == "\t" || line.length() == 0) continue; // skip blank lines
 		int pos = 0;
-		vector <string> cell (6, ""); //Locus	RefPos	Type	ValidAlt	Regex
-		for(int i=0, max = line.length(); i < max; i++){
-			if(line.substr(i,1) == "\t"){
-					pos++;
-			} else if (line.substr(i,1) == "\n" || line.substr(i,1) == "\r"){ //avoid including newline characters in variables
-				continue;
-			} else{
-				cell[pos] += line[i];
-			}
+		vector <string> cell; //Locus	RefPos	Type	ValidAlt
+		splitString(line, '\t', cell);
+		if(cell.size() != 4){
+			cerr << "Error: Line in the position file with wrong number of fields: " << endl;
+			cerr << line << endl;
+			exit(EXIT_FAILURE);
 		}
 		// splitting validAlt
 		vector <char> validAlt;
@@ -126,15 +123,6 @@ void readPosFile(const string& posInput,
 			}
 		}
 		if(posMap.count(cell[0]) == 1){ // already exists in map
-			if(cell[4].length() != 0){
-				if(posMap[cell[0]].regExBool){
-					cerr << "Error: Multiple regEx given for locus " << cell[0] << endl;
-					exit(EXIT_FAILURE);
-				}
-				posMap[cell[0]].regEx = cell[4];
-				posMap[cell[0]].regExBool = true;
-			}
-
 			baseInfo tempBase;
 			tempBase.refPos = stoi(cell[1]) - 1;
 			if(cell[2] == "S"){
@@ -154,12 +142,6 @@ void readPosFile(const string& posInput,
 			locusInfo tempLoc;
 			tempLoc.name = cell[0];
 			locusNames.push_back(cell[0]); // add to list of locus names
-			if(cell[4].length() == 0){
-				tempLoc.regExBool = false;
-			} else {
-				tempLoc.regEx = cell[4];
-				tempLoc.regExBool = true;
-			}
 			baseInfo tempBase;
 			tempBase.refPos = stoi(cell[1]) - 1;
 			if(cell[2] == "S"){

@@ -2,7 +2,6 @@
 // for microtyper
 
 #include <string>
-#include <regex>
 #include <vector>
 #include <unordered_map>
 #include <math.h>
@@ -17,9 +16,7 @@ void calculate_llh(const string bamInput,
 					const double eps_I,
 					const double eps_S){
 	// add individual name to geno tables
-	regex bamEnding ("\\.bam$");
-	string indName = regex_replace(bamInput, bamEnding, "");
-	for(int i = 0, max = locusNames.size(); i < max; i++) locusGenoTables[locusNames[i]].indName = indName;
+	for(int i = 0, max = locusNames.size(); i < max; i++) locusGenoTables[locusNames[i]].indName = bamInput;
 	BamTools::BamReader reader;
 	if (!reader.Open(bamInput)) {
 		cerr << "Error: could not open " << bamInput << endl;
@@ -43,8 +40,6 @@ void calculate_llh(const string bamInput,
 	string rName;
 	genoTable * gT;
 	const locusInfo * lInfo;
-	regex testRegex;
-	bool regexBool;
 	while (reader.GetNextAlignment(al)) {
 
 		// check if paired and throw error if it is
@@ -70,13 +65,6 @@ void calculate_llh(const string bamInput,
 			rName = rL[al.RefID];
 			gT = &locusGenoTables[rName];
 			lInfo = &posMap.at(rName);
-			regexBool = (*lInfo).regExBool;
-			if(regexBool) testRegex.assign((*lInfo).regEx);
-		}
-
-		// skip alignment if regex is present and it does not match
-		if(regexBool){
-			if(!regex_search(al.QueryBases, testRegex)) continue;
 		}
 
 		// add to likelihood of each genotype

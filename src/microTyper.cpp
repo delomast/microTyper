@@ -7,7 +7,6 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
-#include <regex>
 #include <vector>
 #include <unordered_map>
 #include <math.h>
