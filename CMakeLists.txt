@@ -10,12 +10,15 @@ find_package(OpenMP)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Adhere to GNU filesystem layout conventions
+include(GNUInstallDirs)
+
 # compiling included copy of bamtools (Version 2.5.1)
 include(ExternalProject)
 
 set(BAMTOOLS_ROOT ${CMAKE_CURRENT_BINARY_DIR}/bamtools)
-set(BAMTOOLS_INCLUDE_DIRS ${BAMTOOLS_ROOT}/include/bamtools)
-set(BAMTOOLS_LIBRARIES ${BAMTOOLS_ROOT}/lib)
+set(BAMTOOLS_INCLUDE_DIRS "${BAMTOOLS_ROOT}/${CMAKE_INSTALL_INCLUDEDIR}/bamtools")
+set(BAMTOOLS_LIBRARIES "${BAMTOOLS_ROOT}/${CMAKE_INSTALL_LIBDIR}")
 set(bamtools_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/bamtools")
 set(bamtools_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${bamtools_INSTALL_DIR})
 
