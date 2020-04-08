@@ -194,7 +194,7 @@ void readRefSeqs(const string& refInput,
 				if(posMap.count(curSeqName) == 1){
 					posMap[curSeqName].refSequence = curSeq; // assign reference sequence to map
 				} else {
-					cout << "Warning: " << curSeqName << " not in position file. It will not be genotyped." << endl;
+					cerr << "Warning: " << curSeqName << " not in position file. It will not be genotyped." << endl;
 				}
 			}
 			curSeqName = line.substr(1); // name of ref sequence
@@ -208,7 +208,7 @@ void readRefSeqs(const string& refInput,
 	if(posMap.count(curSeqName) == 1){
 		posMap[curSeqName].refSequence = curSeq; // assign reference sequence to map
 	} else {
-		cout << "Warning: " << curSeqName << " not in position file. It will not be genotyped." << endl;
+		cerr << "Warning: " << curSeqName << " not in position file. It will not be genotyped." << endl;
 	}
 
 	// adding reference value to struct baseInfo for each locus: for S, the ref base; D, the value 'I'; I, the value 'D'
