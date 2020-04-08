@@ -17,6 +17,7 @@ First, we unpack and compile
   cmake .
   make
 ```
+Note that cmake 3.9 or higher is required. On some machines, the `cmake` command may need to be replaced with `cmake3`.  
   
 Now, navigate to the example folder  
 ```
