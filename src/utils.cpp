@@ -187,6 +187,7 @@ void readRefSeqs(const string& refInput,
 	string curSeq;
 	bool start = true;
 	while(getline(refFile, line)){
+		if (!line.empty() && *(--line.end()) == '\r') line.erase(--line.end()); // in case windows line endings on a Unix machine
 		if(line.substr(0,1) == ">"){
 			if (start){
 				start = false;
