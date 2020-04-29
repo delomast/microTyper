@@ -119,7 +119,7 @@ Optional arguments
 
 ### The position file
 
-The position file gives information about the SNPs within each locus. It is a tab-delimited file with
+The position file gives information about the SNPs within each locus. It is fairly straightforward to create from a VCF file containing your target SNPs. It is a tab-delimited file with
 a REQUIRED header row (actual text in header row is not important). Each line defines a SNP. 
 The columns are, in order,  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Locus
