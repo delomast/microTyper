@@ -1,12 +1,12 @@
 # microTyper
 genotyping microhaplotypes
 
-Mainly focused on genotyping using reads from amplicon sequencing.  
+Genotyping using reads from amplicon sequencing.
   
 Reads bam files using the bamtools API (Barnett et al. 2011, 
 https://doi.org/10.1093/bioinformatics/btr174), which is bundled with the 
 microTyper code for ease of install.
-  
+
   
 ## Installation and example
 
@@ -60,6 +60,10 @@ compile and function, but will be limited to one thread.
 
 microTyper has two steps, the first calculates log-likelihoods of each genotype and 
 the second calls genotypes based on posterior probability and an optional depth filter.
+
+The required inputs are a file giving information about known variable positions and one or more bam files. 
+Each bam file should represent one diploid individual. Only the known variable positions will be considered,
+all other positions are ignored. 
 
 ### The first step (calculating log-likelihoods):
 
