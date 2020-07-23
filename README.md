@@ -78,6 +78,10 @@ The required inputs are a file giving information about known variable positions
 Each bam file should represent one diploid individual. Only the known variable positions will be considered,
 all other positions are ignored. 
 
+The required inputs are a file giving information about known variable positions and one or more bam files. 
+Each bam file should represent one diploid individual. Only the known variable positions will be considered,
+all other positions are ignored. 
+
 ### The first step:
 
 ```
