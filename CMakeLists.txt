@@ -37,7 +37,7 @@ set_target_properties(libbamtools PROPERTIES IMPORTED_LOCATION ${BAMTOOLS_LIBRAR
 add_dependencies(libbamtools bamtools)
 
 # likelihood calculations
-add_executable(mtype src/microTyper.cpp src/utils.cpp src/utils.h src/calculate_llh.cpp src/calculate_llh_with_logSumExp.cpp src/calculate_llh.h src/typedefs.h)
+add_executable(mtype src/microTyper.cpp src/utils.cpp src/utils.h src/calculate_llh.cpp src/calculate_llh_with_logSumExp.cpp src/calculate_llh.h src/typedefs.h src/count_matches.cpp)
 
 include_directories(${BAMTOOLS_INCLUDE_DIRS})
 target_link_libraries(mtype libbamtools ZLIB::ZLIB)

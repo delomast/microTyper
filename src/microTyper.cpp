@@ -28,6 +28,7 @@ int main(int argc, char* argv[]){
 	int batchSize = 100; // number of individuals to process and write at once -b
 	unsigned int numThreads = 1; // number of threads to use -t
 	bool call_with_lse = false; // to use log-sum-exp --manySNPs
+	bool just_count = false; // to just count perfect matches to each allele, --count
 
 	ios_base::sync_with_stdio(false);
 
@@ -62,6 +63,8 @@ int main(int argc, char* argv[]){
 			 call_with_lse = true;
 		} else if (x == "--version") {
 			 printVersion();
+		} else if (x == "--count") {
+			 just_count = true;
 		} else {
 			cerr << "Error: Option " << x << " not recognized." << endl;
 			return 1;
@@ -140,6 +143,7 @@ int main(int argc, char* argv[]){
 				tGeno.gTable.push_back(tG);
 			}
 		}
+		tGeno.numAlleles = (*tAT).alleleList.size();
 		locusGenoTables[locusNames[i]] = tGeno;
 	}
 
@@ -173,6 +177,8 @@ int main(int argc, char* argv[]){
 			if(call_with_lse){
 				calculate_llh_logSumExp(bamInput[indivPos + b], locusNames, posMap, batchGenos[b],
 					eps_I, eps_S);
+			} else if (just_count) {
+				count_matches(bamInput[indivPos + b], locusNames, posMap, batchGenos[b]);
 			} else {
 				calculate_llh(bamInput[indivPos + b], locusNames, posMap, batchGenos[b],
 					eps_I, eps_S);

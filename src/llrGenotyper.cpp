@@ -13,15 +13,35 @@
 
 using namespace std;
 
+double mult_llh_no_constant(const vector <int>& n, const vector <double>& pi){
+	if(n.size() != pi.size()){
+		cerr << "Internal error in mult_likelihood_no_constant." << endl;
+		exit(EXIT_FAILURE);
+	}
+	double llh = 0;
+	for(int i = 0, m = n.size(); i < m; i++) llh += n[i] * log(pi[i]);
+	return llh;
+}
+
 void addGenotype(const vector <string>& split, genoTable& gT, const bool priorUse,
-				const unordered_map <string, unordered_map<string, double>>& priorMap){
+				const unordered_map <string, unordered_map<string, double>>& priorMap,
+				const bool bool_counts){
 	genotype g;
 	allele a;
 	a.name = split[2];
 	g.A1 = a;
 	a.name = split[3];
 	g.A2 = a;
-	g.llh = stod(split[4]);
+	if(g.A1.name == g.A2.name){
+		g.hom = true;
+	} else {
+		g.hom = false;
+	}
+	if(bool_counts){
+		g.llh = 0;
+	} else {
+		g.llh = stod(split[4]);
+	}
 	g.A1_perfect = stoi(split[5]);
 	g.A2_perfect = stoi(split[6]);
 
@@ -42,7 +62,55 @@ void addGenotype(const vector <string>& split, genoTable& gT, const bool priorUs
 }
 
 // call genotypes with a flat prior
-void callGenotype(const genoTable& gT, ofstream& genoOutFile, const double& c, const double& minPerfect){
+void callGenotype(genoTable& gT, ofstream& genoOutFile, const double& c, const double& minPerfect,
+				const bool bool_counts, const double eps){
+	// if using counts, calculate llh for each genotype here
+	if(bool_counts){
+		vector <string> allele_names;
+		vector <int> allele_counts;
+		// get counts of each allele
+		for(int i = 0, max = gT.gTable.size(); i < max; i++){
+			if(gT.gTable[i].hom){
+				allele_names.push_back(gT.gTable[i].A1.name);
+				allele_counts.push_back(gT.gTable[i].A1_perfect);
+			}
+		}
+		// template vector of probability for multinomial with error rates, so just have to update one or two values
+		vector <double> template_pi (allele_counts.size(), (eps / (allele_counts.size() - 1)));
+		// calculate llh for each genotype
+		for(int i = 0, max = gT.gTable.size(); i < max; i++){
+			vector <double> pi (template_pi);
+			if(gT.gTable[i].hom){
+				// update one value of pi
+				for(int j = 0, m = pi.size(); j < m; j++){
+					if(allele_names[j] == gT.gTable[i].A1.name){
+						pi[j] = 1 - eps;
+						break;
+					}
+				}
+			} else {
+				// update two values of pi
+				int place = 0;
+				for(int j = 0, m = pi.size(); j < m; j++){
+					if(allele_names[j] == gT.gTable[i].A1.name){
+						pi[j] = (.5 * (1 - eps)) + (.5 * eps / (allele_names.size() - 1));
+						// add perfect allele counts to output
+						gT.gTable[i].A1_perfect = allele_counts[j];
+						place++;
+					} else if(allele_names[j] == gT.gTable[i].A2.name){
+						pi[j] = (.5 * (1 - eps)) + (.5 * eps / (allele_names.size() - 1));
+						// add perfect allele counts to output
+						gT.gTable[i].A2_perfect = allele_counts[j];
+						place++;
+					}
+					if(place == 2) break;
+				}
+			}
+			// calc llh
+			gT.gTable[i].llh += mult_llh_no_constant(allele_counts, pi);
+		}
+	}
+
 	int maxl = 0;
 	vector <double> rSum (gT.gTable.size());
 	rSum[0] = gT.gTable[0].llh;
@@ -70,6 +138,8 @@ int main(int argc, char* argv[]){
 	string priorFile; // -p
 	double c = log(.95); // -c probability threshold to accept a genotype: currently assumes a constant prior on genotypes
 	double minPerfect = 0; // -m minimum number of perfect reads for the alleles in that genotype
+	double eps = .01;
+	bool bool_counts = false;
 
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
@@ -90,10 +160,23 @@ int main(int argc, char* argv[]){
 			priorFile = string(argv[++i]);
 		} else if (x == "--version") {
 			 printVersion();
+		} else if (x == "--count") {
+			 bool_counts = true;
+		} else if (x == "-eps") {
+			 eps = stod(argv[++i]);
 		} else {
 			cerr << "Error: Option " << x << " not recognized." << endl;
 			exit(EXIT_FAILURE);
 		}
+	}
+
+	if(!bool_counts){
+		cerr << "Just a friendly warning: you are not using the --count option. " <<
+		"The --count option is typically recommended. Calling genotypes without" <<
+		" --count may lead to a higher rate of calling heterozygous genotypes in " <<
+		"the presence of low levels of index hopping, contamination etc. Basically, " <<
+		"if the only source of error is sequencing error and is more or less independent by position in a read " <<
+		"you are fine. Otherwise, use the --count option." << endl;
 	}
 
 	// input error checking
@@ -195,28 +278,28 @@ int main(int argc, char* argv[]){
 	gT.indName = split[0];
 	gT.locName = split[1];
 
-	addGenotype(split, gT, priorUse, priorMap);
+	addGenotype(split, gT, priorUse, priorMap, bool_counts);
 	split.clear();
 
 	while (getline((*llhIn), line)){
 		splitString(line, '\t', split);
 		// if same, add to list
 		if(split[0] == gT.indName && split[1] == gT.locName){
-			addGenotype(split, gT, priorUse, priorMap);
+			addGenotype(split, gT, priorUse, priorMap, bool_counts);
 		} else {
 			// call genotype
-			callGenotype(gT, genoOutFile, c, minPerfect);
+			callGenotype(gT, genoOutFile, c, minPerfect, bool_counts, eps);
 
 			// start new genoTable
 			gT.gTable.clear();
 			gT.indName = split[0];
 			gT.locName = split[1];
-			addGenotype(split, gT, priorUse, priorMap);
+			addGenotype(split, gT, priorUse, priorMap, bool_counts);
 		}
 		split.clear();
 	}
 	// call last genotype
-	callGenotype(gT, genoOutFile, c, minPerfect);
+	callGenotype(gT, genoOutFile, c, minPerfect, bool_counts, eps);
 
 	if (llhFile.is_open()) llhFile.close();
 	genoOutFile.close();

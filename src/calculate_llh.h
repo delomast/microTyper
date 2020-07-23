@@ -23,5 +23,9 @@ void calculate_llh_logSumExp(const string bamInput,
 					unordered_map <string, genoTable>& locusGenoTables,
 					const double eps_I,
 					const double eps_S);
+void count_matches(const string bamInput,
+					const vector <string>& locusNames,
+					const unordered_map <string, locusInfo>& posMap,
+					unordered_map <string, genoTable>& locusGenoTables);
 
 #endif // CALCULATE_LLH

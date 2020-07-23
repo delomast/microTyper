@@ -44,6 +44,7 @@ struct genoTable{
 	string locName; // name of the locus
 	string indName; // name of the individual
 	vector <genotype> gTable;
+	int numAlleles; // number of alleles at this locus
 };
 
 
