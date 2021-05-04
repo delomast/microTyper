@@ -5,8 +5,22 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
+
+
+// typedefs for microTyper2 - only consider alleles within indiv
+
+struct indAlleleCounts{
+    string indName; // individual name
+    // key is locus name value is map <allele, readcount> allele is
+    //  represented as concatenation of basecalls
+    unordered_map <string, unordered_map <string, int>> locusMap;
+};
+
+
+// typedefs for original microtyper
 
 struct baseInfo {
 	int refPos; // position in reference with 0-offset
@@ -46,8 +60,6 @@ struct genoTable{
 	vector <genotype> gTable;
 	int numAlleles; // number of alleles at this locus
 };
-
-
 
 
 #endif // TYPEDEFS

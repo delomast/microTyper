@@ -12,9 +12,35 @@
 
 using namespace std;
 
+
+// sum of integer vector
+int vecIntSum(const vector <int>& x){
+	int sum = 0;
+	for(int i = 0, m = x.size(); i < m; i++) sum += x[i];
+	return sum;
+}
+
+// multinomial likelihood dropping the constant
+double mult_llh_no_constant(const vector <int>& n, const vector <double>& pi){
+	if(n.size() != pi.size()){
+		cerr << "Internal error in mult_likelihood_no_constant." << endl;
+		exit(EXIT_FAILURE);
+	}
+	double llh = 0;
+	for(int i = 0, m = n.size(); i < m; i++) llh += n[i] * log(pi[i]);
+	return llh;
+}
+
+// calculate number of possible genotypes given ploidy and number of alleles
+int numGenotypes (const int nA, const int ploidy){
+	if(nA == 0) return 0; // should this be returning an error?
+	if(nA == 1) return 1;
+	return static_cast<int> (round(exp(lgamma(nA + ploidy) - (lgamma(ploidy + 1) + lgamma(nA)))));
+}
+
 // print version number
 void printVersion(){
-	cout << "Version 1.0" << endl;
+	cout << "Version 2.0" << endl;
 	exit(EXIT_SUCCESS);
 }
 
@@ -122,6 +148,110 @@ void readPosFile(const string& posInput,
 				nextIsAlt = true;
 			}
 		}
+		if(posMap.count(cell[0]) == 1){ // already exists in map
+			baseInfo tempBase;
+			tempBase.refPos = stoi(cell[1]) - 1;
+			if(cell[2] == "S"){
+				tempBase.type = 0;
+			} else if(cell[2] == "D"){
+				tempBase.type = 1;
+			} else if(cell[2] == "I"){
+				tempBase.type = 2;
+			} else {
+				cerr << "Error: Unrecognized type for locus " << cell[0] << endl;
+				exit(EXIT_FAILURE);
+			}
+			tempBase.validAlt = validAlt;
+
+			posMap[cell[0]].snps.push_back(tempBase);
+		} else {
+			locusInfo tempLoc;
+			tempLoc.name = cell[0];
+			locusNames.push_back(cell[0]); // add to list of locus names
+			baseInfo tempBase;
+			tempBase.refPos = stoi(cell[1]) - 1;
+			if(cell[2] == "S"){
+				tempBase.type = 0;
+			} else if(cell[2] == "D"){
+				tempBase.type = 1;
+			} else if(cell[2] == "I"){
+				tempBase.type = 2;
+			} else {
+				cerr << "Error: Unrecognized type for locus " << cell[0] << endl;
+				exit(EXIT_FAILURE);
+			}
+			tempBase.validAlt = validAlt;
+
+			tempLoc.snps.push_back(tempBase);
+			posMap[cell[0]] = tempLoc;
+		}
+	}
+	posFile.close();
+
+	// put snps in order
+	locusInfo * tlocInfo;
+	for(int i=0, max = locusNames.size(); i < max; i++){
+		tlocInfo = &posMap[locusNames[i]];
+		sort((*tlocInfo).snps.begin(), (*tlocInfo).snps.end(), compareRefPos);
+	}
+}
+
+
+// create map of loci and information as well as vector of locus names
+// for microTyper_2
+// changed handling of indels to fix characters representing ref and alt alleles
+void readPosFile2(const string& posInput,
+				unordered_map <string, locusInfo>& posMap,  // edited by this function instead of returned
+				vector <string>& locusNames){ // edited by this function instead of returned
+	ifstream posFile (posInput);
+	if(!posFile.is_open()){
+		cerr << "Error: variant file specified (-p) could not be opened." << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	string line;
+	getline(posFile, line); // skip header
+	while (getline(posFile, line)){
+		if(line.substr(0,1) == "\t" || line.length() == 0) continue; // skip blank lines
+		int pos = 0;
+		vector <string> cell; //Locus	RefPos	Type	ValidAlt
+		splitString(line, '\t', cell);
+		if(cell.size() < 3 || cell.size() > 4){
+			cerr << "Error: Line in the position file with wrong number of fields: " << endl;
+			cerr << line << endl;
+			exit(EXIT_FAILURE);
+		}
+		// splitting validAlt
+		vector <char> validAlt;
+		if(cell[2] == "S"){
+			bool nextIsAlt = true;
+			for(int i = 0, max = cell[3].size(); i < max; i++){
+				if(nextIsAlt){
+					if(cell[3][i] == ','){
+						cerr << "Error: The validAlt field for a SNP in " << cell[0] << " is not formatted appropriately." <<
+							" Likely error is either a comma at the beginning or multiple commas in a row." << endl;
+						exit(EXIT_FAILURE);
+					}
+					validAlt.push_back(cell[3][i]);
+					nextIsAlt = false;
+				} else {
+					if(cell[3][i] != ','){
+						cerr << "Error: The validAlt field for a SNP in " << cell[0] << " is not formatted appropriately." <<
+							" Likely error is a alternate allele that is more than one character in length." << endl;
+						exit(EXIT_FAILURE);
+					}
+					nextIsAlt = true;
+				}
+			}
+		} else if (cell[2] == "D") {
+			validAlt.push_back('D');
+		} else if (cell[2] == "I") {
+			validAlt.push_back('I');
+		} else {
+			cerr << "Error: Unrecognized type for locus " << cell[0] << endl;
+			exit(EXIT_FAILURE);
+		}
+
 		if(posMap.count(cell[0]) == 1){ // already exists in map
 			baseInfo tempBase;
 			tempBase.refPos = stoi(cell[1]) - 1;

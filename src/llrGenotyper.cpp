@@ -13,16 +13,6 @@
 
 using namespace std;
 
-double mult_llh_no_constant(const vector <int>& n, const vector <double>& pi){
-	if(n.size() != pi.size()){
-		cerr << "Internal error in mult_likelihood_no_constant." << endl;
-		exit(EXIT_FAILURE);
-	}
-	double llh = 0;
-	for(int i = 0, m = n.size(); i < m; i++) llh += n[i] * log(pi[i]);
-	return llh;
-}
-
 void addGenotype(const vector <string>& split, genoTable& gT, const bool priorUse,
 				const unordered_map <string, unordered_map<string, double>>& priorMap,
 				const bool bool_counts){
@@ -132,6 +122,8 @@ void callGenotype(genoTable& gT, ofstream& genoOutFile, const double& c, const d
 }
 
 int main(int argc, char* argv[]){
+
+	cerr << "Just a friendly notice that this function is deprecated. Only use it if you specifically prefer it to the newer option of mtype2." << endl;
 
 	string mhgenosInput; // -f
 	string outputName ("mh_genotypes.txt"); // -o

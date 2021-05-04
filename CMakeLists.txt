@@ -39,11 +39,15 @@ add_dependencies(libbamtools bamtools)
 # likelihood calculations
 add_executable(mtype src/microTyper.cpp src/utils.cpp src/utils.h src/calculate_llh.cpp src/calculate_llh_with_logSumExp.cpp src/calculate_llh.h src/typedefs.h src/count_matches.cpp)
 
+add_executable(mtype2 src/microTyper_2.cpp src/utils.cpp src/utils.h src/countAlleleReads.cpp src/countAlleleReads.h src/typedefs.h)
+
 include_directories(${BAMTOOLS_INCLUDE_DIRS})
 target_link_libraries(mtype libbamtools ZLIB::ZLIB)
+target_link_libraries(mtype2 libbamtools ZLIB::ZLIB)
 # use openmp if found
 if(OpenMP_CXX_FOUND)
     target_link_libraries(mtype OpenMP::OpenMP_CXX)
+    target_link_libraries(mtype2 OpenMP::OpenMP_CXX)
 endif()
 
 # genotype caller

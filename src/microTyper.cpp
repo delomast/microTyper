@@ -19,6 +19,8 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
+	cerr << "Just a friendly notice that this function is deprecated. Only use it if you specifically prefer it to the newer option of mtype2." << endl;
+
 	vector <string> bamInput; // -f
 	string outputName ("microtyper_llh.mhgenos"); // -o
 	string refInput; // -r fasta format
