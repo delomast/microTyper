@@ -56,7 +56,9 @@ Additionally, almost all of the testing has utilized microhaplotypes that are co
 code is intended to be able to genotype indels as well, performance with indels has not been exhaustively tested. 
 You may want to perform some validation on your own. Please alert me of any errors or bugs that you find. 
 
-  
+Also note that microTyper does not guarantee a consistent order of alleles in the output for heterozygotes. For 
+example, in two individuals with genotypes of "AB", one may have Allele1 as "A" and the other may have Allele2 as "A".
+
 ## Manual
 
 ### Goal
