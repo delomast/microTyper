@@ -7,6 +7,7 @@ Reads bam files using the bamtools API (Barnett et al. 2011,
 https://doi.org/10.1093/bioinformatics/btr174), which is bundled with the 
 microTyper code for ease of install.
 
+You may be interested in the wrapper script here: https://github.com/delomast/microhapWrap
   
 ## Installation and example
 
