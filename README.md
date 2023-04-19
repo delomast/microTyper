@@ -2,6 +2,10 @@
 genotyping microhaplotypes
 
 Genotyping using reads from amplicon sequencing.
+
+Citation: Delomas, T.A., et al. 2023. Development of a microhaplotype panel to 
+inform management of gray wolves. Conservation Genetics Resources. 
+https://doi.org/10.1007/s12686-023-01301-x
   
 Reads bam files using the bamtools API (Barnett et al. 2011, 
 https://doi.org/10.1093/bioinformatics/btr174), which is bundled with the 
