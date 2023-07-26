@@ -51,13 +51,6 @@ void countAlleleReads(const string bamInput,
 			exit(EXIT_FAILURE);
 		}
 
-		// check if aligned to reverse strand and throw error if it did
-		if(al.IsReverseStrand()){
-			cerr << "Error: read mapped to reverse strand found in " << bamInput <<
-			  ". Only alignments to the forward strand are currently supported." << endl;
-			exit(EXIT_FAILURE);
-		}
-
 		// skip if unmapped
 		if(!al.IsMapped()) continue;
 
