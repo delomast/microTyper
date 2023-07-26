@@ -90,7 +90,7 @@ compile and function, but will be limited to one thread.
 
 ### Method
 
-microTyper uses aligned reads. It only uses single-end reads mapped to the forward strand. Reads should be 
+microTyper uses single-end aligned reads. Reads should be 
 aligned to "reference amplicons" with each amplicon representing one microhaplotype to call. The required inputs 
 include a file giving information about known variable positions and, for substitution SNPs, 
 the valid alternate alleles (reference alleles are pulled from the reference sequences). Only the known 
