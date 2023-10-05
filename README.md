@@ -118,7 +118,7 @@ it otherwise would. The obvious downfall is: how do you know you've detected all
 is to use a reasonable minimum depth. In amplicon sequencing, depth is usually fairly high, and so we can use that to
 our advantage. Considering a diploid, we may worry about not detecting allele "A" in an individual with genotype "AB" 
 given a selected minimum depth of _d_. The probability of this can be modelled as the probability a binomial random variable 
-with _d_ trials and probability of success of 0.5 is 0. Considering _d_ = 10, this probability is 0.0009765625, or about 0.1%. If 
+with _d_ trials and probability of success of 0.5. Considering _d_ = 10, this probability is 0.0009765625, or about 0.1%. If 
 we reframe the problem as "given a genotype of "AB", what is the probability I only detect one allele", we double this 
 to 0.001953125, or about 0.2%. Depending on whether that is a low enough probability for you or not, you can adjust _d_. Similar logic
 applies to other ploidies, and will suggest larger values of _d_ for larger ploidies. It is also worth noting that 
