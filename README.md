@@ -146,7 +146,7 @@ Required arguments
 - `-p` the "position file" giving information about the microhaplotypes to genotype (see 
   below for details)
 - `-r` a fasta file with the reference sequences that reads were mapped to. Each reference 
-  sequence is assumed to be one locus (and one microhaplotype and one amplicon).
+  sequence is assumed to be one locus (and one microhaplotype and one amplicon). Note that _in the reference file the bases must be capitalized_ (i.e., unmasked).
 
 Optional arguments
 
@@ -184,7 +184,7 @@ The columns are, in order,
 - ValidAlt: 
   - for substitution SNPs, a comma separated list of alternative bases to look for 
     in the read (A,C,T, or G). Bases must be capitalized. The reference base is pulled 
-	automatically from the reference fasta file. Note that _in the reference file the bases should be capitalized_ (i.e., unmasked).
+	automatically from the reference fasta file, so there is no need to list the reference allele here.
   - for insertion SNPs, this is ignored and the alternate allele is automatically designated as "I". The 
     reference allele is automatically designated as "D".
   - for deletion SNPs, this is ignored and the alternate allele is automatically designated as "D". The 
